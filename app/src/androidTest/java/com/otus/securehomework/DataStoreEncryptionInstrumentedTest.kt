@@ -1,7 +1,9 @@
 package com.otus.securehomework
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.otus.securehomework.data.encryption.DataStoreEncryption
+import com.otus.securehomework.data.encryption.KeyManagerLowerThanM
 import com.otus.securehomework.data.encryption.KeyManagerMAndHigher
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
@@ -12,21 +14,35 @@ import org.junit.runner.RunWith
 class DataStoreEncryptionInstrumentedTest {
 
     private lateinit var dataStoreEncryption: DataStoreEncryption
-    private lateinit var keyManager: KeyManagerMAndHigher
+    private lateinit var keyManagerMAndHigher: KeyManagerMAndHigher
+    private lateinit var keyManagerLowerThanM: KeyManagerLowerThanM
+
+    private val testData = "Test Data"
 
     @Before
     fun setUp() {
-        keyManager = KeyManagerMAndHigher()
-        dataStoreEncryption = DataStoreEncryption(keyManager)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        keyManagerMAndHigher = KeyManagerMAndHigher()
+        keyManagerLowerThanM = KeyManagerLowerThanM(context)
     }
 
     @Test
-    fun testEncryptAndDecryptData() {
-        val data = "Test Data"
+    fun testEncryptAndDecryptDataMAndHigher() {
+        dataStoreEncryption = DataStoreEncryption(keyManagerMAndHigher)
 
-        val encryptedData = dataStoreEncryption.encryptData(data)
+        val encryptedData = dataStoreEncryption.encryptData(testData)
         val decryptedData = dataStoreEncryption.decryptData(encryptedData)
 
-        assertEquals(data, decryptedData)
+        assertEquals(testData, decryptedData)
+    }
+
+    @Test
+    fun testEncryptAndDecryptDataLowerThanM() {
+        dataStoreEncryption = DataStoreEncryption(keyManagerLowerThanM)
+
+        val encryptedData = dataStoreEncryption.encryptData(testData)
+        val decryptedData = dataStoreEncryption.decryptData(encryptedData)
+
+        assertEquals(testData, decryptedData)
     }
 }
