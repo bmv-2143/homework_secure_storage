@@ -39,6 +39,7 @@ class RSAKeys(
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
                 .setUserAuthenticationRequired(true)
                 .setRandomizedEncryptionRequired(false)
+                .setKeySize(KEY_SIZE)
                 .build()
         } else {
             val start: Calendar = Calendar.getInstance()
@@ -50,6 +51,7 @@ class RSAKeys(
                 .setSerialNumber(BigInteger.TEN)
                 .setStartDate(start.time)
                 .setEndDate(end.time)
+                .setKeySize(KEY_SIZE)
                 .build()
         }
         return KeyPairGenerator.getInstance(RSA_ALGORITHM, KEY_PROVIDER).run {
@@ -62,5 +64,6 @@ class RSAKeys(
         private const val RSA_KEY_ALIAS = "RSA_OTUS_DEMO"
         private const val RSA_ALGORITHM = "RSA"
         private const val CERTIFICATE_VALIDITY_YEARS = 30
+        private const val KEY_SIZE = 2048
     }
 }
