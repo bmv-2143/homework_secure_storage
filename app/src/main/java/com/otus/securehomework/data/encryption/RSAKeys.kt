@@ -16,8 +16,10 @@ import java.util.Calendar
 import javax.security.auth.x500.X500Principal
 
 
-class RSAKeys(private val applicationContext: Context,
-              private val keyStore: KeyStore) {
+class RSAKeys(
+    private val applicationContext: Context,
+    private val keyStore: KeyStore
+) {
 
     internal fun getRsaPublicKey(): PublicKey {
         return keyStore.getCertificate(RSA_KEY_ALIAS)?.publicKey ?: generateRsaSecretKey().public
@@ -41,13 +43,13 @@ class RSAKeys(private val applicationContext: Context,
         } else {
             val start: Calendar = Calendar.getInstance()
             val end: Calendar = Calendar.getInstance()
-            end.add(Calendar.YEAR, 30)
+            end.add(Calendar.YEAR, CERTIFICATE_VALIDITY_YEARS)
             KeyPairGeneratorSpec.Builder(applicationContext)
                 .setAlias(RSA_KEY_ALIAS)
                 .setSubject(X500Principal("CN=$RSA_KEY_ALIAS"))
                 .setSerialNumber(BigInteger.TEN)
-                .setStartDate(start.getTime())
-                .setEndDate(end.getTime())
+                .setStartDate(start.time)
+                .setEndDate(end.time)
                 .build()
         }
         return KeyPairGenerator.getInstance(RSA_ALGORITHM, KEY_PROVIDER).run {
@@ -59,5 +61,6 @@ class RSAKeys(private val applicationContext: Context,
     companion object {
         private const val RSA_KEY_ALIAS = "RSA_OTUS_DEMO"
         private const val RSA_ALGORITHM = "RSA"
+        private const val CERTIFICATE_VALIDITY_YEARS = 30
     }
 }
