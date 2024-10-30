@@ -1,10 +1,7 @@
 package com.otus.securehomework.data.encryption
 
 import android.content.Context
-import android.os.Build
 import android.security.KeyPairGeneratorSpec
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import com.otus.securehomework.data.encryption.KeyManagerImpl.Companion.KEY_PROVIDER
 import java.math.BigInteger
 import java.security.KeyPair
@@ -16,7 +13,7 @@ import java.util.Calendar
 import javax.security.auth.x500.X500Principal
 
 
-class RSAKeys(
+class RSAKeysLowerThanM(
     private val applicationContext: Context,
     private val keyStore: KeyStore
 ) {
@@ -30,30 +27,19 @@ class RSAKeys(
     }
 
     private fun generateRsaSecretKey(): KeyPair {
-        val spec = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            KeyGenParameterSpec.Builder(
-                RSA_KEY_ALIAS,
-                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-            )
-                .setBlockModes(KeyProperties.BLOCK_MODE_ECB)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
-                .setUserAuthenticationRequired(true)
-                .setRandomizedEncryptionRequired(false)
-                .setKeySize(KEY_SIZE)
-                .build()
-        } else {
-            val start: Calendar = Calendar.getInstance()
-            val end: Calendar = Calendar.getInstance()
-            end.add(Calendar.YEAR, CERTIFICATE_VALIDITY_YEARS)
-            KeyPairGeneratorSpec.Builder(applicationContext)
-                .setAlias(RSA_KEY_ALIAS)
-                .setSubject(X500Principal("CN=$RSA_KEY_ALIAS"))
-                .setSerialNumber(BigInteger.TEN)
-                .setStartDate(start.time)
-                .setEndDate(end.time)
-                .setKeySize(KEY_SIZE)
-                .build()
-        }
+        val start: Calendar = Calendar.getInstance()
+        val end: Calendar = Calendar.getInstance()
+        end.add(Calendar.YEAR, CERTIFICATE_VALIDITY_YEARS)
+
+        val spec = KeyPairGeneratorSpec.Builder(applicationContext)
+            .setAlias(RSA_KEY_ALIAS)
+            .setSubject(X500Principal("CN=$RSA_KEY_ALIAS"))
+            .setSerialNumber(BigInteger.TEN)
+            .setStartDate(start.time)
+            .setEndDate(end.time)
+            .setKeySize(KEY_SIZE)
+            .build()
+
         return KeyPairGenerator.getInstance(RSA_ALGORITHM, KEY_PROVIDER).run {
             initialize(spec)
             generateKeyPair()

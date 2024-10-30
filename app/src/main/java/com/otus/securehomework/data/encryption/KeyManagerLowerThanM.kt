@@ -22,7 +22,7 @@ class KeyManagerLowerThanM @Inject constructor(
     private val applicationContext: Context,
 ) : KeyManagerImpl() {
 
-    private val rsaKeys = RSAKeys(applicationContext, keyStore)
+    private val rsaKeys = RSAKeysLowerThanM(applicationContext, keyStore)
 
     private val sharedPreferences by lazy {
         applicationContext.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE)
