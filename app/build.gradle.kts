@@ -74,6 +74,8 @@ dependencies {
     kapt("androidx.hilt:hilt-compiler:1.2.0")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
 
+    implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
+
     testImplementation("org.mockito:mockito-core:4.0.0")
     testImplementation("org.mockito:mockito-inline:4.0.0")
 
