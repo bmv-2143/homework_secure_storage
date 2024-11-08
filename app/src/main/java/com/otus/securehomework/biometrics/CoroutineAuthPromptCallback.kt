@@ -1,4 +1,4 @@
-package com.otus.myapplication.biometrics
+package com.otus.securehomework.biometrics
 
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.auth.AuthPromptCallback
@@ -8,7 +8,10 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlin.coroutines.resumeWithException
 
 internal class CoroutineAuthPromptCallback(
-    private val continuation: CancellableContinuation<BiometricPrompt.AuthenticationResult>
+    private val continuation: CancellableContinuation<BiometricPrompt.AuthenticationResult>,
+    private val onSuccess: (BiometricPrompt.AuthenticationResult) -> Unit,
+    private val onError: (AuthPromptErrorException) -> Unit,
+    private val onFailed: () -> Unit
 ) : AuthPromptCallback() {
 
     override fun onAuthenticationError(
@@ -16,17 +19,20 @@ internal class CoroutineAuthPromptCallback(
         errorCode: Int,
         errString: CharSequence
     ) {
-        continuation.resumeWithException(AuthPromptErrorException(errorCode, errString))
+        val exception = AuthPromptErrorException(errorCode, errString)
+        onError(exception)
+        continuation.resumeWithException(exception)
     }
 
     override fun onAuthenticationSucceeded(
         activity: FragmentActivity?,
         result: BiometricPrompt.AuthenticationResult
     ) {
+        onSuccess(result)
         continuation.resumeWith(Result.success(result))
     }
 
     override fun onAuthenticationFailed(activity: FragmentActivity?) {
-        // Stub
+        onFailed()
     }
 }
