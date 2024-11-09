@@ -31,8 +31,8 @@ class UserPreferences
         context.dataStore.edit { preferences ->
             val encryptedAccessToken = dataStoreEncryption.encryptData(accessToken)
             val encryptedRefreshToken = dataStoreEncryption.encryptData(refreshToken)
-            encryptedAccessToken?.let { preferences[ACCESS_TOKEN] = it }
-            encryptedRefreshToken?.let { preferences[REFRESH_TOKEN] = it }
+            encryptedAccessToken.let { preferences[ACCESS_TOKEN] = it }
+            encryptedRefreshToken.let { preferences[REFRESH_TOKEN] = it }
         }
     }
 
