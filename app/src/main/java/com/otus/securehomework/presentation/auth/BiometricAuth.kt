@@ -11,11 +11,14 @@ import androidx.biometric.auth.AuthPromptHost
 import androidx.biometric.auth.Class2BiometricAuthPrompt
 import androidx.biometric.auth.Class3BiometricAuthPrompt
 import androidx.fragment.app.FragmentActivity
-import com.otus.myapplication.biometrics.BiometricCipher
+import com.otus.securehomework.R
+import com.otus.securehomework.biometrics.BiometricCipher
 import com.otus.securehomework.biometrics.authenticate2
 import javax.inject.Inject
 
 class BiometricAuth @Inject constructor(private val authActivity: FragmentActivity) {
+
+    private val tag = BiometricAuth::class.simpleName
 
     internal fun isBiometryStrongAvailable(): Boolean {
         return BiometricManager
@@ -48,15 +51,16 @@ class BiometricAuth @Inject constructor(private val authActivity: FragmentActivi
                 onFailed = onFailed
             )
         } catch (e: AuthPromptErrorException) {
-            Log.e("Biometric", "!!! Authentication ERROR: ${e.message}")
+            logBiometryError(e)
         }
     }
 
     private fun makeStrongBiometricPrompt() = Class3BiometricAuthPrompt.Builder(
-        "Strong biometry", "dismiss"
+        authActivity.getString(R.string.biometry_title_strong_biometry),
+        authActivity.getString(R.string.biometry_button_dismiss)
     ).apply {
-        setSubtitle("Input your biometry")
-        setDescription("We need your finger")
+        setSubtitle(authActivity.getString(R.string.biometry_subtitle_input_your_biometry))
+        setDescription(authActivity.getString(R.string.biometry_description_we_need_your_finger))
         setConfirmationRequired(true)
     }.build()
 
@@ -75,14 +79,21 @@ class BiometricAuth @Inject constructor(private val authActivity: FragmentActivi
                 onFailed = onFailed
             )
         } catch (e: AuthPromptErrorException) {
-            Log.e("Biometric", "!!! Authentication ERROR: ${e.message}")
+            logBiometryError(e)
         }
     }
 
+    private fun logBiometryError(e: AuthPromptErrorException) {
+        Log.e(tag, "Authentication ERROR: ${e.message}")
+    }
+
     private fun makeWeakBiometricPrompt() =
-        Class2BiometricAuthPrompt.Builder("Weak biometry", "dismiss").apply {
-            setSubtitle("Input your biometry")
-            setDescription("We need your finger")
+        Class2BiometricAuthPrompt.Builder(
+            authActivity.getString(R.string.biometry_title_weak_biometry),
+            authActivity.getString(R.string.biometry_button_dismiss)
+        ).apply {
+            setSubtitle(authActivity.getString(R.string.biometry_subtitle_input_your_biometry))
+            setDescription(authActivity.getString(R.string.biometry_description_we_need_your_finger))
             setConfirmationRequired(true)
         }.build()
 }

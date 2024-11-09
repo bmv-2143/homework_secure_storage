@@ -26,13 +26,13 @@ class AuthActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 biometricAuth.authenticateStrongBiometry(
                     onSuccess = {
-                        showToast("Authentication SUCCEEDED!")
+                        showToast(getString(R.string.biometry_authentication_succeeded))
                     },
                     onError = { error ->
-                        showToast("Authentication ERROR: $error")
+                        showToast(getString(R.string.biometry_authentication_error, error))
                     },
                     onFailed = {
-                        showToast("Authentication FAILED")
+                        showToast(getString(R.string.biometry_authentication_failed))
                     }
                 )
             }
@@ -40,18 +40,18 @@ class AuthActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 biometricAuth.authenticateWeakBiometry(
                     onSuccess = {
-                        showToast("Authentication SUCCEEDED!")
+                        showToast(getString(R.string.biometry_authentication_succeeded))
                     },
                     onError = { error ->
-                        showToast("Authentication ERROR: $error")
+                        showToast(getString(R.string.biometry_authentication_error, error))
                     },
                     onFailed = {
-                        showToast("Authentication FAILED")
+                        showToast(getString(R.string.biometry_authentication_failed))
                     }
                 )
             }
         } else {
-            showToast("Biometry not supported")
+            showToast(getString(R.string.biometry_not_supported))
         }
     }
 

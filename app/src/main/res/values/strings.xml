@@ -14,4 +14,13 @@
     <string name="forgot_your_password">Forgot your password?</string>
     <string name="register_now">Register Now</string>
     <string name="already_have_an_account_login_now">Already have an account? <b>Login Now</b></string>
+    <string name="biometry_authentication_succeeded">Authentication SUCCEEDED!</string>
+    <string name="biometry_authentication_error">Authentication ERROR: %1$s</string>
+    <string name="biometry_authentication_failed">Authentication FAILED</string>
+    <string name="biometry_not_supported">Biometry not supported</string>
+    <string name="biometry_subtitle_input_your_biometry">Input your biometry</string>
+    <string name="biometry_description_we_need_your_finger">We need your finger</string>
+    <string name="biometry_title_weak_biometry">Weak biometry</string>
+    <string name="biometry_title_strong_biometry">Strong biometry</string>
+    <string name="biometry_button_dismiss">Exit app</string>
 </resources>

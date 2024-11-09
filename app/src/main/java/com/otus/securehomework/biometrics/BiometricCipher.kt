@@ -1,4 +1,4 @@
-package com.otus.myapplication.biometrics
+package com.otus.securehomework.biometrics
 
 import android.content.Context
 import android.content.pm.PackageManager
