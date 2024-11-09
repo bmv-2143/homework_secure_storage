@@ -13,26 +13,41 @@ import androidx.biometric.auth.Class3BiometricAuthPrompt
 import androidx.fragment.app.FragmentActivity
 import com.otus.securehomework.R
 import com.otus.securehomework.biometrics.BiometricCipher
-import com.otus.securehomework.biometrics.authenticate2
+import com.otus.securehomework.biometrics.authenticateBiometry
 import javax.inject.Inject
 
 class BiometricAuth @Inject constructor(private val authActivity: FragmentActivity) {
 
     private val tag = BiometricAuth::class.simpleName
 
-    internal fun isBiometryStrongAvailable(): Boolean {
+    internal suspend fun authenticateBiometry(
+        onSuccess: (BiometricPrompt.AuthenticationResult) -> Unit,
+        onError: (AuthPromptErrorException) -> Unit,
+        onFailed: () -> Unit,
+        onBiometryNotAvailable: () -> Unit
+    ) {
+        if (isBiometryStrongAvailable()) {
+            authenticateStrongBiometry(onSuccess, onError, onFailed)
+        } else if (isBiometryWeakAvailable()) {
+            authenticateWeakBiometry(onSuccess, onError, onFailed)
+        } else {
+            onBiometryNotAvailable()
+        }
+    }
+
+    private fun isBiometryStrongAvailable(): Boolean {
         return BiometricManager
             .from(authActivity)
             .canAuthenticate(BIOMETRIC_STRONG) == BIOMETRIC_SUCCESS
     }
 
-    internal fun isBiometryWeakAvailable(): Boolean {
+    private fun isBiometryWeakAvailable(): Boolean {
         return BiometricManager
             .from(authActivity)
             .canAuthenticate(BIOMETRIC_WEAK) == BIOMETRIC_SUCCESS
     }
 
-    internal suspend fun authenticateStrongBiometry(
+    private suspend fun authenticateStrongBiometry(
         onSuccess: (BiometricPrompt.AuthenticationResult) -> Unit,
         onError: (AuthPromptErrorException) -> Unit,
         onFailed: () -> Unit
@@ -43,7 +58,7 @@ class BiometricAuth @Inject constructor(private val authActivity: FragmentActivi
         val cryptoObject: BiometricPrompt.CryptoObject = biometricCipher.getEncryptor()
 
         try {
-            authPrompt.authenticate2(
+            authPrompt.authenticateBiometry(
                 AuthPromptHost(authActivity),
                 crypto = cryptoObject,
                 onSuccess = onSuccess,
@@ -64,7 +79,7 @@ class BiometricAuth @Inject constructor(private val authActivity: FragmentActivi
         setConfirmationRequired(true)
     }.build()
 
-    internal suspend fun authenticateWeakBiometry(
+    private suspend fun authenticateWeakBiometry(
         onSuccess: (BiometricPrompt.AuthenticationResult) -> Unit,
         onError: (AuthPromptErrorException) -> Unit,
         onFailed: () -> Unit
@@ -72,7 +87,7 @@ class BiometricAuth @Inject constructor(private val authActivity: FragmentActivi
         val authPrompt = makeWeakBiometricPrompt()
 
         try {
-            authPrompt.authenticate2(
+            authPrompt.authenticateBiometry(
                 AuthPromptHost(authActivity),
                 onSuccess = onSuccess,
                 onError = onError,

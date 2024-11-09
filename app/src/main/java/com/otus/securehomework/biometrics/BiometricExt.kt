@@ -7,7 +7,7 @@ import androidx.biometric.auth.Class2BiometricAuthPrompt
 import androidx.biometric.auth.Class3BiometricAuthPrompt
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-suspend fun Class3BiometricAuthPrompt.authenticate2(
+suspend fun Class3BiometricAuthPrompt.authenticateBiometry(
     host: AuthPromptHost,
     crypto: BiometricPrompt.CryptoObject?,
     onSuccess: (BiometricPrompt.AuthenticationResult) -> Unit,
@@ -28,7 +28,7 @@ suspend fun Class3BiometricAuthPrompt.authenticate2(
     }
 }
 
-suspend fun Class2BiometricAuthPrompt.authenticate2(
+suspend fun Class2BiometricAuthPrompt.authenticateBiometry(
     host: AuthPromptHost,
     onSuccess: (BiometricPrompt.AuthenticationResult) -> Unit,
     onError: (AuthPromptErrorException) -> Unit,

@@ -31,40 +31,24 @@ class SplashActivity  : AppCompatActivity() {
     }
 
     private fun showBiometricPrompt() {
-        if (biometricAuth.isBiometryStrongAvailable()) {
-            lifecycleScope.launch {
-                biometricAuth.authenticateStrongBiometry(
-                    onSuccess = {
-                        showToast(getString(R.string.biometry_authentication_succeeded))
-                        navigateBasedOnAuthData(userPreferences)
-                    },
-                    onError = { error ->
-                        showToast(getString(R.string.biometry_authentication_error, error))
-                        finish()
-                    },
-                    onFailed = {
-                        showToast(getString(R.string.biometry_authentication_failed))
-                    }
-                )
-            }
-        } else if (biometricAuth.isBiometryWeakAvailable()) {
-            lifecycleScope.launch {
-                biometricAuth.authenticateWeakBiometry(
-                    onSuccess = {
-                        showToast(getString(R.string.biometry_authentication_succeeded))
-                        navigateBasedOnAuthData(userPreferences)
-                    },
-                    onError = { error ->
-                        showToast(getString(R.string.biometry_authentication_error, error))
-                        finish()
-                    },
-                    onFailed = {
-                        showToast(getString(R.string.biometry_authentication_failed))
-                    }
-                )
-            }
-        } else {
-            showToast(getString(R.string.biometry_not_supported))
+        lifecycleScope.launch { // todo
+            biometricAuth.authenticateBiometry(
+                onSuccess = {
+                    showToast(getString(R.string.biometry_authentication_succeeded))
+                    navigateBasedOnAuthData(userPreferences)
+                },
+                onError = { error ->
+                    showToast(getString(R.string.biometry_authentication_error, error))
+                    finish()
+                },
+                onFailed = {
+                    showToast(getString(R.string.biometry_authentication_failed))
+                },
+                onBiometryNotAvailable = {
+                    showToast(getString(R.string.biometry_not_supported))
+                    navigateBasedOnAuthData(userPreferences)
+                }
+            )
         }
     }
 
