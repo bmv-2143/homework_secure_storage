@@ -1,5 +1,6 @@
 package com.otus.securehomework.presentation.auth
 
+import android.os.Build
 import android.util.Log
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
@@ -53,20 +54,26 @@ class BiometricAuth @Inject constructor(private val authActivity: FragmentActivi
         onFailed: () -> Unit
     ) {
         val authPrompt = makeStrongBiometricPrompt()
-
         val biometricCipher = BiometricCipher(authActivity)
-        val cryptoObject: BiometricPrompt.CryptoObject = biometricCipher.getEncryptor()
 
-        try {
-            authPrompt.authenticateBiometry(
-                AuthPromptHost(authActivity),
-                crypto = cryptoObject,
-                onSuccess = onSuccess,
-                onError = onError,
-                onFailed = onFailed
-            )
-        } catch (e: AuthPromptErrorException) {
-            logBiometryError(e)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val cryptoObject: BiometricPrompt.CryptoObject = biometricCipher.getEncryptor()
+            try {
+                authPrompt.authenticateBiometry(
+                    AuthPromptHost(authActivity),
+                    crypto = cryptoObject,
+                    onSuccess = onSuccess,
+                    onError = { e ->
+                        onError(e)
+                        Log.e(tag, "Error: $e")
+                    },
+                    onFailed = onFailed
+                )
+            } catch (e: AuthPromptErrorException) {
+                logBiometryError(e)
+            }
+        } else {
+            Log.e(tag, "Strong biometry is not available")
         }
     }
 

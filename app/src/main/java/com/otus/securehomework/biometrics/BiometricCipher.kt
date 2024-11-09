@@ -10,6 +10,7 @@ import android.security.keystore.KeyProperties.ENCRYPTION_PADDING_NONE
 import android.security.keystore.KeyProperties.KEY_ALGORITHM_AES
 import android.security.keystore.KeyProperties.PURPOSE_DECRYPT
 import android.security.keystore.KeyProperties.PURPOSE_ENCRYPT
+import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricPrompt
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -22,6 +23,7 @@ class BiometricCipher(
 ) {
     private val keyAlias by lazy { "${applicationContext.packageName}.biometricKey" }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     fun getEncryptor(): BiometricPrompt.CryptoObject {
         val encryptor = Cipher.getInstance(TRANSFORMATION).apply {
             init(Cipher.ENCRYPT_MODE, getOrCreateKey())
@@ -29,6 +31,7 @@ class BiometricCipher(
         return BiometricPrompt.CryptoObject(encryptor)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun getOrCreateKey(): SecretKey = getSecretKey() ?: createSecretKey()
 
     private fun getSecretKey(): SecretKey? {
@@ -41,6 +44,7 @@ class BiometricCipher(
         return null
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun createSecretKey() : SecretKey {
         val keySpec = KeyGenParameterSpec.Builder(keyAlias, PURPOSE_ENCRYPT or PURPOSE_DECRYPT)
             .setBlockModes(BLOCK_MODE_GCM)
