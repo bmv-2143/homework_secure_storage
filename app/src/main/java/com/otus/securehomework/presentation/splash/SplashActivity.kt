@@ -1,36 +1,88 @@
 package com.otus.securehomework.presentation.splash
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import com.otus.securehomework.R
-import com.otus.securehomework.data.encryption.DataStoreEncryption
 import com.otus.securehomework.data.source.local.UserPreferences
 import com.otus.securehomework.presentation.auth.AuthActivity
+import com.otus.securehomework.presentation.auth.BiometricAuth
 import com.otus.securehomework.presentation.home.HomeActivity
 import com.otus.securehomework.presentation.startNewActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SplashActivity  : AppCompatActivity() {
 
     @Inject
-    lateinit var dataStoreEncryption: DataStoreEncryption
+    lateinit var userPreferences: UserPreferences
+
+    @Inject
+    lateinit var biometricAuth: BiometricAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-        val userPreferences = UserPreferences(this, dataStoreEncryption)
+        showBiometricPrompt()
+    }
 
-        userPreferences.accessToken.asLiveData().observe(this, Observer {
+    private fun showBiometricPrompt() {
+        if (biometricAuth.isBiometryStrongAvailable()) {
+            lifecycleScope.launch {
+                biometricAuth.authenticateStrongBiometry(
+                    onSuccess = {
+                        showToast(getString(R.string.biometry_authentication_succeeded))
+                        navigateBasedOnAuthData(userPreferences)
+                    },
+                    onError = { error ->
+                        showToast(getString(R.string.biometry_authentication_error, error))
+                        finish()
+                    },
+                    onFailed = {
+                        showToast(getString(R.string.biometry_authentication_failed))
+                    }
+                )
+            }
+        } else if (biometricAuth.isBiometryWeakAvailable()) {
+            lifecycleScope.launch {
+                biometricAuth.authenticateWeakBiometry(
+                    onSuccess = {
+                        showToast(getString(R.string.biometry_authentication_succeeded))
+                        navigateBasedOnAuthData(userPreferences)
+                    },
+                    onError = { error ->
+                        showToast(getString(R.string.biometry_authentication_error, error))
+                        finish()
+                    },
+                    onFailed = {
+                        showToast(getString(R.string.biometry_authentication_failed))
+                    }
+                )
+            }
+        } else {
+            showToast(getString(R.string.biometry_not_supported))
+        }
+    }
+
+    private fun navigateBasedOnAuthData(userPreferences: UserPreferences) {
+        userPreferences.accessToken.asLiveData().observe(this) {
             val activity = if (it == null) {
                 AuthActivity::class.java
             } else {
                 HomeActivity::class.java
             }
             startNewActivity(activity)
-        })
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(
+            applicationContext, message,
+            Toast.LENGTH_LONG
+        ).show()
     }
 }
